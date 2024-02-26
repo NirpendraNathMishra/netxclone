@@ -1,4 +1,4 @@
-import { useEffect, useState,useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import "./videoplayer.css"; // Import the CSS file
@@ -8,9 +8,9 @@ function VideoPlayer() {
     const navigate = useNavigate();
     let videos = useSelector(state => state.videos);
     const videoId = location.pathname.split('/').pop();
-    let videoIndex = videos.findIndex(video => video.id.toString() === videoId);
+    const [videoIndex, setVideoIndex] = useState(videos.findIndex(video => video.id.toString() === videoId));
     const [currentVideo, setCurrentVideo] = useState(videos[videoIndex]);
-    const videoRef = useRef(); const [lastScrollTop, setLastScrollTop] = useState(0);
+    const [lastScrollTop, setLastScrollTop] = useState(0);
 
     useEffect(() => {
         if (!currentVideo) {
@@ -19,46 +19,33 @@ function VideoPlayer() {
     }, [currentVideo, navigate]);
 
     useEffect(() => {
-        const handleKeyPress = (event) => {
-            const videoIndex = videos.findIndex(video => video.id.toString() === currentVideo.id.toString());
-            let newIndex;
-            let animationName;
-            if (event.key === 'ArrowUp') {
-                newIndex = videoIndex - 1 >= 0 ? videoIndex - 1 : videos.length - 1;
-                animationName = 'slide-down';
-            } else if (event.key === 'ArrowDown') {
-                newIndex = videoIndex + 1 < videos.length ? videoIndex + 1 : 0;
-                animationName = 'slide-up';
-            }
-            if (newIndex !== undefined) {
-                setCurrentVideo({...videos[newIndex], animation: animationName});
-            }
+        const handleKeyPress = () => {
+            let newIndex = Math.floor(Math.random() * videos.length);
+            setCurrentVideo({...videos[newIndex]});
         };
         window.addEventListener('keydown', handleKeyPress);
         return () => {
             window.removeEventListener('keydown', handleKeyPress);
         };
-    }, [currentVideo, videos]);
+    }, [videos]);
 
-    useEffect(() => {
+   useEffect(() => {
         const handleScroll = () => {
             const st = window.pageYOffset || document.documentElement.scrollTop;
             if (st > lastScrollTop){
-                
-                setCurrentVideo(videos[videoIndex + 1 < videos.length ? videoIndex + 1 : 0]);
-            } else {
-                
-                setCurrentVideo(videos[videoIndex - 1 >= 0 ? videoIndex - 1 : videos.length - 1]);
+                let newIndex = Math.floor(Math.random() * videos.length);
+                setCurrentVideo(videos[newIndex]);
             }
-            setLastScrollTop(st <= 0 ? 0 : st); 
+            setLastScrollTop(st <= 0 ? 0 : st);
         };
     
         window.addEventListener('scroll', handleScroll);
     
         return () => {
-            window.removeEventListener('scroll', handleScroll);
+           window.removeEventListener('scroll', handleScroll);
         };
-    }, [lastScrollTop, videos, videoIndex]);
+    }, [lastScrollTop, videos]);
+
 
     if (!currentVideo) {
         return null;
@@ -75,7 +62,7 @@ function VideoPlayer() {
                 playsInline={true}
                 onClick={(e) => e.target.paused ? e.target.play() : e.target.pause()}
             >
-                <source src={currentVideo.video_files[0].link} type="video/mp4"/>
+                <source src={currentVideo.video_files[3].link} type="video/mp4"/>
                 Your browser does not support the video tag.
             </video>
         </div>

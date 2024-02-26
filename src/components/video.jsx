@@ -25,6 +25,7 @@ function Video() {
           const data = await response.json();
           const portraitVideos = data.videos.filter(video => video.width < video.height);
           dispatch({ type: 'SET_VIDEOS', payload: portraitVideos });
+          localStorage.setItem('videos', JSON.stringify(portraitVideos));
         } else {
           console.log("HTTP-Error: " + response.status);
         }
@@ -33,10 +34,13 @@ function Video() {
       }
         }
     };
+    if (videos.length === 0) { 
+      fetchVideos();
+    }
 
     fetchVideos();
 
-  }, [dispatch]);
+  }, [dispatch,videos.length]);
 
   return (
       <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around'}}>
