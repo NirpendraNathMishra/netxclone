@@ -51,6 +51,7 @@ function VideoPlayer() {
                 autoPlay={true}
                 loop={true}
                 muted={false}
+                playsInline={true}
                 onClick={(e) => e.target.paused ? e.target.play() : e.target.pause()}
             >
                 <source src={currentVideo.video_files[0].link} type="video/mp4"/>
