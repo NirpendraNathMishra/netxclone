@@ -29,10 +29,10 @@ function VideoPlayer() {
         };
     }, [videos]);
 
-   useEffect(() => {
+    useEffect(() => {
         const handleScroll = () => {
             const st = window.pageYOffset || document.documentElement.scrollTop;
-            if (st > lastScrollTop){
+            if (st !== lastScrollTop){
                 let newIndex = Math.floor(Math.random() * videos.length);
                 setCurrentVideo(videos[newIndex]);
             }
@@ -42,11 +42,10 @@ function VideoPlayer() {
         window.addEventListener('scroll', handleScroll);
     
         return () => {
-           window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('scroll', handleScroll);
         };
     }, [lastScrollTop, videos]);
-
-
+    
     if (!currentVideo) {
         return null;
     }
