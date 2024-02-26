@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState,useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import "./videoplayer.css"; // Import the CSS file
@@ -6,10 +6,11 @@ import "./videoplayer.css"; // Import the CSS file
 function VideoPlayer() {
     const location = useLocation();
     const navigate = useNavigate();
-    const videos = useSelector(state => state.videos);
+    let videos = useSelector(state => state.videos);
     const videoId = location.pathname.split('/').pop();
-    const videoIndex = videos.findIndex(video => video.id.toString() === videoId);
+    let videoIndex = videos.findIndex(video => video.id.toString() === videoId);
     const [currentVideo, setCurrentVideo] = useState(videos[videoIndex]);
+    const videoRef = useRef(); const [lastScrollTop, setLastScrollTop] = useState(0);
 
     useEffect(() => {
         if (!currentVideo) {
@@ -38,6 +39,26 @@ function VideoPlayer() {
             window.removeEventListener('keydown', handleKeyPress);
         };
     }, [currentVideo, videos]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const st = window.pageYOffset || document.documentElement.scrollTop;
+            if (st > lastScrollTop){
+                
+                setCurrentVideo(videos[videoIndex + 1 < videos.length ? videoIndex + 1 : 0]);
+            } else {
+                
+                setCurrentVideo(videos[videoIndex - 1 >= 0 ? videoIndex - 1 : videos.length - 1]);
+            }
+            setLastScrollTop(st <= 0 ? 0 : st); 
+        };
+    
+        window.addEventListener('scroll', handleScroll);
+    
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [lastScrollTop, videos, videoIndex]);
 
     if (!currentVideo) {
         return null;
